@@ -10,3 +10,8 @@ output "cluster_endpoint" {
 output "network_name" {
   value = module.vpc.network_name
 }
+
+output "ingress_ip" {
+  description = "Cloudflare GSLB에 등록할 IP"
+  value       = module.vpc.ingress_ip
+}

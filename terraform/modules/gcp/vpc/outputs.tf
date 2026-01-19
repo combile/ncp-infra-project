@@ -21,3 +21,8 @@ output "pods_secondary_range_name" {
 output "services_secondary_range_name" {
   value = "services"
 }
+
+output "ingress_ip" {
+  description = "Ingress용 고정 IP 주소"
+  value       = google_compute_global_address.ingress.address
+}

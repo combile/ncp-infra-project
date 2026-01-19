@@ -95,3 +95,10 @@ resource "google_compute_firewall" "allow_health_check" {
   source_ranges = ["130.211.0.0/22", "35.191.0.0/16"]  # GCP 로드밸런서 헬스체크 IP
   target_tags   = ["gke-node"]                      # GKE 노드에만 적용
 }
+
+# MARK: Ingress용 고정 IP
+resource "google_compute_global_address" "ingress" {
+  name         = "${var.network_name}-ingress-ip"
+  project      = var.project_id
+  address_type = "EXTERNAL"
+}
