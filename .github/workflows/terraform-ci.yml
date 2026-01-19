@@ -34,11 +34,21 @@ jobs:
       uses: hashicorp/setup-terraform@v3
 
     - name: Terraform Init
-      run: terraform init
+      run: terraform init -backend-config="bucket=${{ secrets.GCP_TF_STATE_BUCKET }}"
 
     - name: Terraform Plan
-      run: terraform plan -input=false
+      run: |
+        terraform plan -input=false \
+          -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
+          -var="region=${{ secrets.GCP_REGION }}" \
+          -var="network_name=${{ secrets.GCP_NETWORK_NAME }}" \
+          -var="cluster_name=${{ secrets.GCP_CLUSTER_NAME }}"
 
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve -input=false
+      run: |
+        terraform apply -auto-approve -input=false \
+          -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
+          -var="region=${{ secrets.GCP_REGION }}" \
+          -var="network_name=${{ secrets.GCP_NETWORK_NAME }}" \
+          -var="cluster_name=${{ secrets.GCP_CLUSTER_NAME }}"
