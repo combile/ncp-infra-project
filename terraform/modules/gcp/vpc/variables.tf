@@ -24,7 +24,7 @@ variable "subnet_cidr" {
 
 variable "pods_cidr" {
   type    = string
-  default = "10.4.0.0/14"
+  default = "10.20.0.0/14"
 }
 
 variable "services_cidr" {
