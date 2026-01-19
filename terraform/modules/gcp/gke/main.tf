@@ -10,7 +10,7 @@ terraform {
 resource "google_container_cluster" "main" {
   name     = var.cluster_name
   project  = var.project_id
-  location = var.region
+  location = "${var.region}-a"
 
   network    = var.network_name
   subnetwork = var.subnet_name
@@ -46,7 +46,7 @@ resource "google_container_cluster" "main" {
 resource "google_container_node_pool" "main" {
   name       = "${var.cluster_name}-node-pool"
   project    = var.project_id
-  location   = var.region
+  location   = "${var.region}-a"
   cluster    = google_container_cluster.main.name
   node_count = var.min_node_count
 
