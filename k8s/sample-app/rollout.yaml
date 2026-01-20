@@ -1,5 +1,5 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: sample-app
   labels:
@@ -26,3 +26,15 @@ spec:
           limits:
             cpu: "100m"
             memory: "128Mi"
+  strategy:
+    canary:
+      # 카나리 배포 단계: 9:1 → 5:5 → 0:10
+      steps:
+        - setWeight: 10
+        - pause: {duration: 1m}
+        - setWeight: 50
+        - pause: {duration: 1m}
+        - setWeight: 100
+      # 트래픽 라우팅을 위한 서비스 설정
+      canaryService: sample-app-canary
+      stableService: sample-app-stable
