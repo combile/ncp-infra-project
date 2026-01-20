@@ -16,6 +16,9 @@ jobs:
     defaults:
       run:
         working-directory: ./terraform/live/ncp-active
+    env:
+      NCLOUD_ACCESS_KEY: ${{ secrets.NCLOUD_ACCESS_KEY }}
+      NCLOUD_SECRET_KEY: ${{ secrets.NCLOUD_SECRET_KEY }}
 
     steps:
       - name: Checkout
