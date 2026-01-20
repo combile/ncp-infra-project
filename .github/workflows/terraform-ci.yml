@@ -3,7 +3,11 @@ name: "Terraform CI"
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - "terraform/live/gcp-standby/**"
   pull_request:
+    paths:
+      - "terraform/live/gcp-standby/**"
 
 permissions:
   contents: 'read'
