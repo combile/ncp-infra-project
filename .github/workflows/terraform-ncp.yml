@@ -1,10 +1,13 @@
-name: "Terraform CI - NCP"
+name: Terraform CI - NCP
 
-on: 
+on:
   push:
     branches: ["main"]
     paths:
       - "terraform/live/ncp-active/**"
+      - "terraform/modules/ncp/**"
+      - ".github/workflows/terraform-ncp.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -12,26 +15,25 @@ permissions:
 jobs:
   terraform-ncp:
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: ./terraform/live/ncp-active
+
     env:
       NCLOUD_ACCESS_KEY: ${{ secrets.NCLOUD_ACCESS_KEY }}
       NCLOUD_SECRET_KEY: ${{ secrets.NCLOUD_SECRET_KEY }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false
 
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -input=false
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve -input=false
