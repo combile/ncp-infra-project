@@ -3,6 +3,8 @@ name: "Terraform CI - NCP"
 on:
   push:
     branches: ["main"]
+    paths:
+      - "terraform/live/ncp-active/**"
 
 permissions:
   contents: read
