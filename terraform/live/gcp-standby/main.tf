@@ -7,10 +7,6 @@ terraform {
       version = ">= 4.0"
     }
   }
-
-  backend "gcs" {
-    prefix = "terraform/state/gcp-standby"
-  }
 }
 
 provider "google" {

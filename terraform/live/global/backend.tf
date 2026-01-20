@@ -1,5 +1,5 @@
 terraform {
   backend "gcs" {
-    prefix = "terraform/state/global"
+      prefix = "terraform/state/gcp-standby"
   }
 }
