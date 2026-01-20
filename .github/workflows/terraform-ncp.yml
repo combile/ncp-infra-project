@@ -1,6 +1,6 @@
 name: "Terraform CI - NCP"
 
-on:
+on: 
   push:
     branches: ["main"]
     paths:
