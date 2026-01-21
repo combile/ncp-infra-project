@@ -2,10 +2,11 @@ apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: sample-app
+  namespace: app
   labels:
     app: sample-app
 spec:
-  replicas: 2 # pods수 조정
+  replicas: 10 # pods수 조정
   selector:
     matchLabels:
       app: sample-app
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:alpine
+        image: nginx:alpine # TODO: 커스텀 이미지 등록
         ports:
         - containerPort: 80
         resources:
@@ -28,13 +29,11 @@ spec:
             memory: "128Mi"
   strategy:
     canary:
-      # 카나리 배포 단계: 9:1 → 5:5 → 0:10
       steps:
-        - setWeight: 10
+        - setWeight: 10 # step 1 (트래픽 10%)
         - pause: {duration: 1m}
         - setWeight: 50
         - pause: {duration: 1m}
         - setWeight: 100
-      # 트래픽 라우팅을 위한 서비스 설정
-      canaryService: sample-app-canary
-      stableService: sample-app-stable
+      canaryService: sample-app-canary # 카나리 새 버전
+      stableService: sample-app-stable # 기존 서비스
