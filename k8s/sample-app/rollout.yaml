@@ -5,7 +5,7 @@ metadata:
   labels:
     app: sample-app
 spec:
-  replicas: 2
+  replicas: 2 # pods수 조정
   selector:
     matchLabels:
       app: sample-app
