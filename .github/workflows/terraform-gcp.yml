@@ -1,11 +1,15 @@
-name: "Terraform CI"
+name: "Terraform gcp"
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+      - "feature-*"
     paths:
       - "terraform/live/gcp-standby/**"
   pull_request:
+    branches:
+      - main
     paths:
       - "terraform/live/gcp-standby/**"
 

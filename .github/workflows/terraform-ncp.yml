@@ -2,7 +2,16 @@ name: Terraform CI - NCP
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+      - "feature-*"
+    paths:
+      - "terraform/live/ncp-active/**"
+      - "terraform/modules/ncp/**"
+      - ".github/workflows/terraform-ncp.yml"
+  pull_request:
+    branches:
+      - main
     paths:
       - "terraform/live/ncp-active/**"
       - "terraform/modules/ncp/**"
