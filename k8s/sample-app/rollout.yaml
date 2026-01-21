@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:alpine # TODO: 커스텀 이미지 등록
+        image: yxxunseo/sample-app:test # TODO: 커스텀 이미지 등록
         ports:
         - containerPort: 80
         resources:
