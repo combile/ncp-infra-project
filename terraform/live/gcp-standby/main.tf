@@ -8,11 +8,12 @@ terraform {
     }
   }
 }
-
+ 
 provider "google" {
   project = var.project_id
   region  = var.region
 }
+
 
 module "vpc" {
   source = "../../modules/gcp/vpc"
@@ -31,3 +32,4 @@ module "gke" {
   network_name = module.vpc.network_name
   subnet_name  = module.vpc.subnet_name
 }
+
