@@ -13,7 +13,8 @@ data:
     global:
       scrape_interval: 15s
       external_labels:
-        cluster: gcp
+        cloud: gcp
+        cluster: gcp-prod
 
     scrape_configs:
       - job_name: 'prometheus'
