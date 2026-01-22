@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:latest # 사용자의 요청으로 nginx로 변경 (기존: yxxunseo/sample-app:test)
+        image: yxxunseo/sample-app:latest
         ports:
         - containerPort: 80
         resources:
@@ -37,3 +37,5 @@ spec:
         - setWeight: 100
       canaryService: sample-app-canary # 카나리 새 버전
       stableService: sample-app-stable # 기존 서비스
+
+

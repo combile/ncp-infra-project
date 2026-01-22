@@ -56,7 +56,7 @@ jobs:
 
     - name: Watch Rollout Status
       run: |
-        kubectl argo rollouts status sample-app --timeout=300s -n app
+        kubectl argo rollouts status sample-app --timeout=300s -n app 
 
     - name: Get Rollout Info
       if: always()
