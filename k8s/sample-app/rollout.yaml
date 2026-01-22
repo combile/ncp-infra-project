@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: yxxunseo/sample-app:latest
+        image: yxxunseo/sample-app:test-002
         ports:
         - containerPort: 80
         resources:
