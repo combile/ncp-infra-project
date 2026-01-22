@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: yxxunseo/sample-app:test # TODO: 커스텀 이미지 등록
+        image: nginx:latest # 사용자의 요청으로 nginx로 변경 (기존: yxxunseo/sample-app:test)
         ports:
         - containerPort: 80
         resources:
@@ -31,7 +31,7 @@ spec:
     canary:
       steps:
         - setWeight: 10 # step 1 (트래픽 10%)
-        - pause: {duration: 1m}
+        - pause: {duration: 1m} # 1분 딜레이
         - setWeight: 50
         - pause: {duration: 1m}
         - setWeight: 100
