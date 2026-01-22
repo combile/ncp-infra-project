@@ -12,11 +12,14 @@ data:
   prometheus.yml: |
     global:
       scrape_interval: 15s
+      external_labels:
+        cluster: gcp
+
     scrape_configs:
       - job_name: 'prometheus'
         static_configs:
           - targets: ['localhost:9090']
-      # sample-app 스크래핑 (NodePort/ClusterIP 서비스)
+
       - job_name: 'sample-app'
         kubernetes_sd_configs:
           - role: service
@@ -27,6 +30,15 @@ data:
           - source_labels: [__meta_kubernetes_namespace]
             regex: app
             action: keep
+
+    remote_write:
+      - url: "http://monitoring-prometheus-ce-079a3-122959744-9217183155df.kr.lb.naverncp.com/api/v1/write"
+        queue_config:
+          max_shards: 4
+          max_samples_per_send: 1000
+
+
+
 ---
 apiVersion: apps/v1
 kind: Deployment
