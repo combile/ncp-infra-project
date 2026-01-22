@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lettie - 타임캡슐</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1e 100%);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 16px;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        /* Main Content */
+        main {
+            padding-top: 120px;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        /* Background Stars */
+        .stars-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgb(207, 209, 213);
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Hero Section */
+        .hero-title {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInUp 1s ease-out;
+            z-index: 100;
+            position: relative;
+        }
+
+        .hero-title h1 {
+            font-size: clamp(32px, 5vw, 48px);
+            line-height: 1.4;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Buttons */
+        .button-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            animation: fadeInUp 1s ease-out 0.2s backwards;
+            z-index: 100;
+            position: relative;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* User Count */
+        .user-count {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            animation: fadeInUp 1s ease-out 0.4s backwards;
+            z-index: 100;
+            position: relative;
+        }
+
+        /* Physics Container */
+        .physics-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .physics-body {
+            position: absolute;
+            visibility: visible;
+            pointer-events: auto;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            width: 180px;
+            height: 180px;
+        }
+
+        .physics-body:active {
+            cursor: grabbing;
+        }
+
+        .physics-body img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(100, 180, 255, 0.5);
+            animation: sparkle 3s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { 
+                filter: brightness(1);
+                transform: scale(1);
+            }
+            50% { 
+                filter: brightness(1.2);
+                transform: scale(1.05);
+            }
+        }
+
+        /* Apply different color filters for variety */
+        .physics-body.type-0 img {
+            filter: hue-rotate(0deg) brightness(1.1);
+            box-shadow: 0 0 40px rgba(100, 180, 255, 0.6);
+        }
+
+        .physics-body.type-1 img {
+            filter: hue-rotate(280deg) brightness(1.1) saturate(1.2);
+            box-shadow: 0 0 40px rgba(255, 100, 200, 0.6);
+        }
+
+        .physics-body.type-2 img {
+            filter: hue-rotate(60deg) brightness(1.1) saturate(1.1);
+            box-shadow: 0 0 40px rgba(150, 255, 100, 0.6);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Canvas for physics debug (hidden) */
+        #physics-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 4;
+            opacity: 0; /* Set to 0.3 to see physics wireframes for debugging */
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .button-container {
+                flex-direction: column;
+                width: 100%;
+                padding: 0 20px;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .physics-body {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        /* Instructions overlay */
+        .instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            z-index: 100;
+            max-width: 300px;
+        }
+
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        .close-instructions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="#" class="logo">Lettie</a>
+        <ul class="nav-links">
+            <li><a href="#explore">탐색</a></li>
+            <li><a href="#my-capsule">내 캡슐</a></li>
+            <li><a href="#setting">설정</a></li>
+        </ul>
+    </nav>
+
+    <!-- Stars Background -->
+    <div class="stars-container" id="starsContainer"></div>
+
+    <!-- Main Content -->
+    <main>
+        <div class="hero-title">
+            <h1>당신을 위한 타임캡슐<br>느린 이야기를 주고 받아요</h1>
+        </div>
+
+        <div class="button-container">
+            <a href="#explore" class="btn btn-primary">
+                타임캡슐 보러가기
+                <span>→</span>
+            </a>
+            <a href="#create-capsule" class="btn btn-secondary">
+                타임캡슐 만들기
+            </a>
+        </div>
+
+        <div class="user-count">
+            <p><span id="userCount">105</span>명이 이야기를 주고 받는 중</p>
+        </div>
+    </main>
+
+    <!-- Physics Container -->
+    <div class="physics-container" id="physicsContainer"></div>
+
+    <!-- Physics Debug Canvas -->
+    <canvas id="physics-canvas"></canvas>
+
+    <!-- Instructions -->
+    <div class="instructions" id="instructions">
+        <button class="close-instructions" onclick="closeInstructions()">×</button>
+        <h3>사용 방법</h3>
+        <ul>
+            <li>🐱 glitter_effect.gif 파일을 이 HTML과 같은 폴더에 넣으세요</li>
+            <li>🖱️ 구슬을 드래그해서 움직이세요</li>
+            <li>👆 화면을 클릭하면 구슬이 튕겨나가요</li>
+        </ul>
+    </div>
+
+    <script>
+        // ⚠️ IMPORTANT: Place 'glitter_effect.gif' in the same folder as this HTML file!
+        const GLITTER_IMAGE_PATH = 'glitter_effect.gif';
+
+        // Matter.js setup
+        const Engine = Matter.Engine,
+            Render = Matter.Render,
+            Runner = Matter.Runner,
+            Bodies = Matter.Bodies,
+            Body = Matter.Body,
+            Composite = Matter.Composite,
+            Mouse = Matter.Mouse,
+            MouseConstraint = Matter.MouseConstraint;
+
+        // Create engine
+        const engine = Engine.create();
+        engine.world.gravity.y = 0.03;
+
+        // Create renderer
+        const canvas = document.getElementById('physics-canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const render = Render.create({
+            canvas: canvas,
+            engine: engine,
+            options: {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                wireframes: true,
+                background: 'transparent',
+                wireframeBackground: 'transparent',
+                showVelocity: false
+            }
+        });
+
+        // Walls
+        const wallThickness = 50;
+        const walls = [
+            Bodies.rectangle(window.innerWidth / 2, window.innerHeight + wallThickness / 2, window.innerWidth, wallThickness, { isStatic: true }),
+            Bodies.rectangle(window.innerWidth / 2, -wallThickness / 2, window.innerWidth, wallThickness, { isStatic: true }),
+            Bodies.rectangle(-wallThickness / 2, window.innerHeight / 2, wallThickness, window.innerHeight, { isStatic: true }),
+            Bodies.rectangle(window.innerWidth + wallThickness / 2, window.innerHeight / 2, wallThickness, window.innerHeight, { isStatic: true })
+        ];
+        Composite.add(engine.world, walls);
+
+        // Physics bodies data - adjust positions based on screen size
+        const bodiesData = [
+            { x: window.innerWidth * 0.2, y: window.innerHeight * 0.4, size: 90 },
+            { x: window.innerWidth * 0.7, y: window.innerHeight * 0.3, size: 90 },
+            { x: window.innerWidth * 0.3, y: window.innerHeight * 0.5, size: 90 },
+            { x: window.innerWidth * 0.8, y: window.innerHeight * 0.4, size: 90 },
+            { x: window.innerWidth * 0.6, y: window.innerHeight * 0.6, size: 90 },
+            { x: window.innerWidth * 0.5, y: window.innerHeight * 0.35, size: 90 },
+            { x: window.innerWidth * 0.65, y: window.innerHeight * 0.2, size: 90 },
+            { x: window.innerWidth * 0.15, y: window.innerHeight * 0.45, size: 90 },
+            { x: window.innerWidth * 0.4, y: window.innerHeight * 0.55, size: 90 },
+            { x: window.innerWidth * 0.9, y: window.innerHeight * 0.35, size: 90 }
+        ];
+
+        const physicsBodies = [];
+        const domElements = [];
+
+        // Create physics bodies and DOM elements
+        bodiesData.forEach((data, index) => {
+            // Create physics body
+            const body = Bodies.circle(data.x, data.y, data.size, {
+                restitution: 0.8,
+                friction: 0.3,
+                density: 0.001,
+                frictionAir: 0.01,
+                label: `body-${index}`
+            });
+            
+            physicsBodies.push(body);
+            
+            // Create DOM element with the glitter cat image
+            const element = document.createElement('div');
+            element.className = `physics-body type-${index % 3}`;
+            element.setAttribute('data-physics-body', 'true');
+            
+            // Create img element
+            const img = document.createElement('img');
+            img.src = GLITTER_IMAGE_PATH;
+            img.alt = 'glitter cat bubble';
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            
+            // Error handling for missing image
+            img.onerror = function() {
+                // If image fails to load, create a fallback CSS bubble
+                this.style.display = 'none';
+                const fallback = document.createElement('div');
+                fallback.style.width = '100%';
+                fallback.style.height = '100%';
+                fallback.style.borderRadius = '50%';
+                fallback.style.background = `radial-gradient(circle at 30% 30%, 
+                    hsl(${index * 40}, 70%, 60%), 
+                    hsl(${index * 40}, 70%, 40%))`;
+                fallback.style.boxShadow = 'inset 0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(100,180,255,0.5)';
+                fallback.innerHTML = '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 60px;">🐱</div>';
+                element.appendChild(fallback);
+            };
+            
+            element.appendChild(img);
+            document.getElementById('physicsContainer').appendChild(element);
+            domElements.push(element);
+        });
+
+        // Add all bodies to the world
+        Composite.add(engine.world, physicsBodies);
+
+        // Mouse control
+        const mouse = Mouse.create(document.body);
+        const mouseConstraint = MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: {
+                stiffness: 0.2,
+                render: { visible: false }
+            }
+        });
+        Composite.add(engine.world, mouseConstraint);
+
+        // Update DOM elements to match physics bodies
+        function updateDOM() {
+            physicsBodies.forEach((body, index) => {
+                const element = domElements[index];
+                if (element) {
+                    const x = body.position.x;
+                    const y = body.position.y;
+                    const angle = body.angle;
+                    
+                    element.style.top = `${y}px`;
+                    element.style.left = `${x}px`;
+                    element.style.transform = `translate(-50%, -50%) rotate(${angle}rad)`;
+                }
+            });
+            
+            requestAnimationFrame(updateDOM);
+        }
+
+        // Run the engine
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+        Render.run(render);
+        
+        // Start DOM updates
+        updateDOM();
+
+        // Generate stars
+        function generateStars() {
+            const container = document.getElementById('starsContainer');
+            const starCount = 35;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random() * 3 + 0.5;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                
+                container.appendChild(star);
+            }
+        }
+
+        // Animate user count
+        function animateUserCount() {
+            const countElement = document.getElementById('userCount');
+            const targetCount = 105;
+            let currentCount = 0;
+            
+            const interval = setInterval(() => {
+                currentCount += Math.ceil((targetCount - currentCount) / 10);
+                countElement.textContent = currentCount;
+                
+                if (currentCount >= targetCount) {
+                    clearInterval(interval);
+                }
+            }, 50);
+        }
+
+        // Close instructions
+        function closeInstructions() {
+            document.getElementById('instructions').style.display = 'none';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            generateStars();
+            animateUserCount();
+            
+            // Add initial velocity to bodies after a short delay
+            setTimeout(() => {
+                physicsBodies.forEach(body => {
+                    Body.setVelocity(body, {
+                        x: (Math.random() - 0.5) * 5,
+                        y: (Math.random() - 0.5) * 5
+                    });
+                });
+            }, 1000);
+
+            // Check if image loads successfully
+            const testImg = new Image();
+            testImg.onload = function() {
+                console.log('✅ Glitter image loaded successfully!');
+                // Hide instructions after successful load
+                setTimeout(() => {
+                    closeInstructions();
+                }, 5000);
+            };
+            testImg.onerror = function() {
+                console.warn('⚠️ Please place glitter_effect.gif in the same folder as this HTML file');
+            };
+            testImg.src = GLITTER_IMAGE_PATH;
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Update walls
+            Body.setPosition(walls[0], { x: window.innerWidth / 2, y: window.innerHeight + wallThickness / 2 });
+            Body.setPosition(walls[1], { x: window.innerWidth / 2, y: -wallThickness / 2 });
+            Body.setPosition(walls[2], { x: -wallThickness / 2, y: window.innerHeight / 2 });
+            Body.setPosition(walls[3], { x: window.innerWidth + wallThickness / 2, y: window.innerHeight / 2 });
+        });
+
+        // Add click interaction - apply force to nearby bodies
+        document.addEventListener('click', (e) => {
+            // Don't trigger on button clicks
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A') return;
+            
+            const clickPoint = { x: e.clientX, y: e.clientY };
+            
+            physicsBodies.forEach(body => {
+                const distance = Math.sqrt(
+                    Math.pow(body.position.x - clickPoint.x, 2) + 
+                    Math.pow(body.position.y - clickPoint.y, 2)
+                );
+                
+                if (distance < 200) {
+                    const force = {
+                        x: (body.position.x - clickPoint.x) * 0.0001,
+                        y: (body.position.y - clickPoint.y) * 0.0001 - 0.005
+                    };
+                    Body.applyForce(body, body.position, force);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
